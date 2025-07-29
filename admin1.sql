@@ -192,42 +192,43 @@ BEGIN
     END IF
 END;
 -- Generate Vehicles
+-- CREATE OR REPLACE FUNCTION data_generator_api AS
+--         vin := generate_Vehicle_telemetry();
+--         generate_telemetry(vin);
+--     END data_generator_api;
+--     /
+
 CREATE OR REPLACE FUNCTION data_generator_api AS
-        vin := generate_Vehicle_telemetry();
-        generate_telemetry(vin);
-    END data_generator_api;
-    /
+    FUNCTION generate_Vehicle RETURN NUMBER IS
+        v_sql NUMBER;
+    BEGIN
+        v_sql := 'SELECT VIN FROM VEHICLE ORDER BY DBMS_RANDOM.VALUE FETCH NEXT 1 ROWS ONLY';
+        RETURN v_sql;
+    END generate_Vehicle;
 
-    CREATE OR REPLACE PACKAGE BODY data_generator_api AS
-        FUNCTION generate_Vehicle RETURN SYS_REFCURSOR IS
-            v_cursor SYS_REFCURSOR;
-            v_sql VARCHAR2(4000);
-        BEGIN
-            v_sql := 'SELECT VIN FROM VEHICLE ORDER BY DBMS_RANDOM.VALUE FETCH NEXT 1 ROWS ONLY';
-            RETURN v_sql;
-        END generate_Vehicle;
-
-        FUNCTION generate_telemetry(vin IN NUMBER) IS
-            latitude NUMBER;
-            longitude NUMBER;
-            speed NUMBER;
-            Engine_status VARCHAR(5);
-            Fuel_battery_level NUMBER;
-            Odometer_reading NUMBER;
-            Diagnostic_codes VARCHAR(50);
-            Timestamp_reading TIMESTAMP;
-        BEGIN
-            latitude := DBMS_RANDOM.VALUE(0,90);
-            longitude := 'SELECT DBMS_RANDOM.VALUE(0,90)';
-            speed := 'SELECT DBMS_RANDOM.VALUE(0,700)';
-            Engine_status := 'SELECT status FROM engine_status where id = DBMS_RANDOM.VALUE(1,(SELECT COUNT(*) FROM engine_status)';
-            Fuel_battery_level := 'SELECT DBMS_RANDOM.VALUE(0,100)';
-            Odometer_reading := 'SELECT DBMS_RANDOM.VALUE(0,1000)';
-            Diagnostic_codes := 'SELECT DBMS_RANDOM.VALUE(1,5)';
-            Timestamp_reading := CURRENT_TIMESTAMP;
-            
-            INSERT INTO Vehicle_generated VALUES(vin, latitude, longitude, speed, Engine_status, Fuel_battery_level, Odometer_reading, Diagnostic_codes, timestamp_reading);
-        END generate_random_number;
-    END data_generator_api;
+    FUNCTION generate_telemetry(vin IN NUMBER) IS
+        vin NUMBER;
+        latitude NUMBER;
+        longitude NUMBER;
+        speed NUMBER;
+        Engine_status VARCHAR(5);
+        Fuel_battery_level NUMBER;
+        Odometer_reading NUMBER;
+        Diagnostic_codes VARCHAR(50);
+        Timestamp_reading TIMESTAMP;
+    BEGIN
+        vin := generate_Vehicle();
+        latitude := DBMS_RANDOM.VALUE(0,90);
+        longitude := 'SELECT DBMS_RANDOM.VALUE(0,90)';
+        speed := 'SELECT DBMS_RANDOM.VALUE(0,700)';
+        Engine_status := 'SELECT status FROM engine_status where id = DBMS_RANDOM.VALUE(1,(SELECT COUNT(*) FROM engine_status)';
+        Fuel_battery_level := 'SELECT DBMS_RANDOM.VALUE(0,100)';
+        Odometer_reading := 'SELECT DBMS_RANDOM.VALUE(0,1000)';
+        Diagnostic_codes := 'SELECT DBMS_RANDOM.VALUE(1,5)';
+        Timestamp_reading := CURRENT_TIMESTAMP;
+        
+        INSERT INTO Vehicle_generated VALUES(vin, latitude, longitude, speed, Engine_status, Fuel_battery_level, Odometer_reading, Diagnostic_codes, timestamp_reading);
+    END generate_random_number;
+END data_generator_api;
     
     
