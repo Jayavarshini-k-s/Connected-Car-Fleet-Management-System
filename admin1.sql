@@ -166,7 +166,8 @@ BEGIN
     speed_count := 'SELECT count(*) FROM alert_summary where alert_speed=1';
 
     fuel_count := 'SELECT count(*) FROM alert_summary where alert_fuel=1';
-    
+    DBMS_OUTPUT.PUT_LINE(speed_count);
+    DBMS_OUTPUT.PUT_LINE(fuel_count);
 END;
 -- Alert
 FUNCTION speed_violation(vin NUMBER) RETURN BOOLEAN IS
